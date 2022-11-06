@@ -46,10 +46,10 @@ if (typeof fetch !== "undefined") {
   };
 
   [
-    "./iconmonstr-check-mark-8-icon.svg",
-    "./iconmonstr-paperclip-2-icon.svg",
-    "./iconmonstr-puzzle-icon.svg",
-    "./iconmonstr-user-icon.svg",
+    "./svgFiles/iconmonstr-check-mark-8-icon.svg",
+    "./svgFiles/iconmonstr-paperclip-2-icon.svg",
+    "./svgFiles/iconmonstr-puzzle-icon.svg",
+    "./svgFiles/iconmonstr-user-icon.svg",
   ].forEach(function (path, i) {
     loadSvg(path).then(function (root) {
       var color = Common.choose([
@@ -83,7 +83,7 @@ if (typeof fetch !== "undefined") {
     });
   });
 
-  loadSvg("./svg.svg").then(function (root) {
+  loadSvg("./svgFiles/svg.svg").then(function (root) {
     var color = Common.choose([
       "#f19648",
       "#f5d259",
