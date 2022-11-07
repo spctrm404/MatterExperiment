@@ -1,9 +1,28 @@
 class Polygon {
   constructor(x, y, sides, radius, options) {
     this.body = Matter.Bodies.polygon(x, y, sides, radius, options);
-    // Matter.Composite.add(engine.world, this.body);
+    Matter.Composite.add(engine.world, this.body);
+    this.fillColor = null;
+    this.strokeColor = null;
+  }
+  getBody() {
+    return this.body;
+  }
+  setFillColor(fillColor) {
+    this.fillColor = fillColor;
+    return this;
+  }
+  setStrokeColor(strokeColor) {
+    this.strokeColor = strokeColor;
+    return this;
   }
   render() {
+    if (this.strokeColor !== null) {
+      strokeWeight(1);
+      stroke(this.strokeColor);
+    } else noStroke();
+    if (this.fillColor !== null) fill(this.fillColor);
+    else noFill();
     beginShape();
     this.body.vertices.forEach((v) => {
       vertex(v.x, v.y);
@@ -11,6 +30,8 @@ class Polygon {
     endShape(CLOSE);
   }
   renderDirVector() {
+    strokeWeight(1);
+    stroke(0);
     line(
       this.body.position.x,
       this.body.position.y,

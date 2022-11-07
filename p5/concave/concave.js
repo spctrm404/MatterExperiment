@@ -1,47 +1,18 @@
-var Engine = Matter.Engine,
-  Render = Matter.Render,
-  Runner = Matter.Runner,
+let Engine = Matter.Engine,
   Composites = Matter.Composites,
-  Common = Matter.Common,
   MouseConstraint = Matter.MouseConstraint,
   Mouse = Matter.Mouse,
   Composite = Matter.Composite,
   Vertices = Matter.Vertices,
   Bodies = Matter.Bodies;
 
-// provide concave decomposition support library
-// Common.setDecomp(require("poly-decomp"));
-
 // create engine
-var engine = Engine.create(),
-  world = engine.world;
+let engine;
 
-// create renderer
-var render = Render.create({
-  element: document.body,
-  engine: engine,
-  options: {
-    width: 800,
-    height: 600,
-  },
-});
+// add mouse control
+let mouse;
 
-Render.run(render);
-
-// create runner
-var runner = Runner.create();
-Runner.run(runner, engine);
-
-// add bodies
-Composite.add(world, [
-  // walls
-  Bodies.rectangle(400, 0, 800, 50, { isStatic: true }),
-  Bodies.rectangle(400, 600, 800, 50, { isStatic: true }),
-  Bodies.rectangle(800, 300, 50, 600, { isStatic: true }),
-  Bodies.rectangle(0, 300, 50, 600, { isStatic: true }),
-]);
-
-var arrow = Vertices.fromPath("40 0 40 20 100 20 100 80 40 80 40 100 0 50"),
+let arrow = Vertices.fromPath("40 0 40 20 100 20 100 80 40 80 40 100 0 50"),
   chevron = Vertices.fromPath("100 0 75 50 100 100 25 100 0 50 25 0"),
   star = Vertices.fromPath(
     "50 0 63 38 100 38 69 59 82 100 50 75 18 100 31 59 0 38 37 38"
@@ -49,34 +20,55 @@ var arrow = Vertices.fromPath("40 0 40 20 100 20 100 80 40 80 40 100 0 50"),
   horseShoe = Vertices.fromPath(
     "35 7 19 17 14 38 14 58 25 79 45 85 65 84 65 66 46 67 34 59 30 44 33 29 45 23 66 23 66 7 53 7"
   );
+let concaves = [arrow, chevron, star, horseShoe];
 
-var stack = Composites.stack(50, 50, 6, 4, 10, 10, function (x, y) {
-  var color = Common.choose([
-    "#f19648",
-    "#f5d259",
-    "#f55a3c",
-    "#063e7b",
-    "#ececd1",
-  ]);
-  return Bodies.fromVertices(
-    x,
-    y,
-    Common.choose([arrow, chevron, star, horseShoe]),
-    {
-      render: {
-        fillStyle: color,
-        strokeStyle: color,
-        lineWidth: 1,
-      },
-    },
-    true
+let canvas;
+let matterObjs = [];
+let colors = ["#ececd1", "#f55a3c", "#f19648", "#f5d259", "#063e7b"];
+
+function createWalls(thickness) {
+  let walls = [
+    new Rect(width * 0.5, 0, width, thickness, {
+      isStatic: true,
+    }).setStrokeColor("#cccccc"),
+    new Rect(width * 0.5, height, width, thickness, {
+      isStatic: true,
+    }).setStrokeColor("#cccccc"),
+    new Rect(width, height * 0.5, thickness, height, {
+      isStatic: true,
+    }).setStrokeColor("#cccccc"),
+    new Rect(0, height * 0.5, thickness, height, {
+      isStatic: true,
+    }).setStrokeColor("#cccccc"),
+  ];
+  walls.forEach((wall) => matterObjs.push(wall));
+}
+
+function setup() {
+  let dom = document.getElementById("sketch");
+  canvas = createCanvas(
+    dom.getBoundingClientRect().width,
+    dom.getBoundingClientRect().height
   );
-});
+  canvas.parent("sketch");
+  engine = Engine.create();
+  world = engine.world;
 
-Composite.add(world, stack);
+  Composites.stack(50, 50, 6, 4, 10, 10, function (x, y) {
+    let idx = Math.floor(random(concaves.length));
+    let newObj = new FromConcaveBody(
+      Bodies.fromVertices(x, y, concaves[idx], null, true)
+    ).setFillColor(colors[Math.floor(random(colors.length))]);
+    matterObjs.push(newObj);
+    return newObj.getBody();
+  });
 
-// add mouse control
-var mouse = Mouse.create(render.canvas),
+  createWalls(50);
+
+  console.log(matterObjs);
+
+  mouse = Mouse.create(canvas.elt);
+  mouse.pixelRatio = pixelDensity();
   mouseConstraint = MouseConstraint.create(engine, {
     mouse: mouse,
     constraint: {
@@ -87,13 +79,16 @@ var mouse = Mouse.create(render.canvas),
     },
   });
 
-Composite.add(world, mouseConstraint);
+  Composite.add(world, mouseConstraint);
+}
 
-// keep the mouse in sync with rendering
-render.mouse = mouse;
-
-// fit the render viewport to the scene
-Render.lookAt(render, {
-  min: { x: 0, y: 0 },
-  max: { x: 800, y: 600 },
-});
+function draw() {
+  background(255);
+  Engine.update(engine);
+  matterObjs.forEach((obj) => {
+    obj.render();
+  });
+  // matterObjs.forEach((obj) => {
+  //   obj.renderDirVector();
+  // });
+}
