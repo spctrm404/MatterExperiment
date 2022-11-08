@@ -17,16 +17,16 @@ let colors = ["#ececd1", "#f55a3c", "#f19648", "#f5d259", "#063e7b"];
 
 function createWalls(thickness) {
   let walls = [
-    new Rect(width * 0.5, 0, width, thickness, {
+    new P5Rect(width * 0.5, 0, width, thickness, {
       isStatic: true,
     }).setStrokeColor("#cccccc"),
-    new Rect(width * 0.5, height, width, thickness, {
+    new P5Rect(width * 0.5, height, width, thickness, {
       isStatic: true,
     }).setStrokeColor("#cccccc"),
-    new Rect(width, height * 0.5, thickness, height, {
+    new P5Rect(width, height * 0.5, thickness, height, {
       isStatic: true,
     }).setStrokeColor("#cccccc"),
-    new Rect(0, height * 0.5, thickness, height, {
+    new P5Rect(0, height * 0.5, thickness, height, {
       isStatic: true,
     }).setStrokeColor("#cccccc"),
   ];
@@ -57,20 +57,20 @@ function setup() {
     switch (Math.round(random(0, 1))) {
       case 0:
         if (random() < 0.8) {
-          newObj = new Rect(x, y, random(25, 50), random(25, 50), {
+          newObj = new P5Rect(x, y, random(25, 50), random(25, 50), {
             chamfer: chamfer,
           }).setFillColor(colors[Math.floor(random(colors.length))]);
           matterObjs.push(newObj);
           return newObj.getBody();
         } else {
-          newObj = new Rect(x, y, random(80, 120), random(25, 30), {
+          newObj = new P5Rect(x, y, random(80, 120), random(25, 30), {
             chamfer: chamfer,
           }).setFillColor(colors[Math.floor(random(colors.length))]);
           matterObjs.push(newObj);
           return newObj.getBody();
         }
       case 1:
-        newObj = new Polygon(x, y, sides, random(25, 50), {
+        newObj = new P5Polygon(x, y, sides, random(25, 50), {
           chamfer: chamfer,
         }).setFillColor(colors[Math.floor(random(colors.length))]);
         matterObjs.push(newObj);
